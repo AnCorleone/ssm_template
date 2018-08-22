@@ -1,0 +1,17 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+/src/main/webapp/img/category/
+/src/main/webapp/img/productSingle_small/
+/src/main/webapp/img/site/
+/src/main/webapp/img/productDetail/
+/src/main/webapp/img/productSingle_middle/
+/src/main/webapp/img/lunbo/
+/src/main/webapp/img/productSingle/
+target/
