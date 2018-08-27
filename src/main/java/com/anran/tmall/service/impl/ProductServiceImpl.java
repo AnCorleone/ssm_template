@@ -8,6 +8,7 @@ import com.anran.tmall.pojo.ProductImage;
 import com.anran.tmall.service.CategoryService;
 import com.anran.tmall.service.ProductImageService;
 import com.anran.tmall.service.ProductService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,68 +50,76 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product get(int id) {
         Product product = productMapper.selectByPrimaryKey(id);
-        setCategory(product);
         setFirstProductImage(product);
+        setCategory(product);
         return product;
     }
 
-    private void setCategory(Product product) {
-        Integer cid = product.getCid();
-        Category category = categoryService.get(cid);
-        product.setCategory(category);
+    public void setCategory(Product p) {
+        int cid = p.getCid();
+        Category c = categoryService.get(cid);
+        p.setCategory(c);
+    }
+
+    public void setCategory(List<Product> ps) {
+        for (Product p : ps) {
+            setCategory(p);
+        }
     }
 
     @Override
-    public List<Product> list(int cid) {
+    public List list(int cid) {
         ProductExample example = new ProductExample();
         example.createCriteria().andCidEqualTo(cid);
         example.setOrderByClause("id desc");
-        List<Product> products = productMapper.selectByExample(example);
-        setFirstProductImage(products);
-        return products;
+        List result = productMapper.selectByExample(example);
+        setCategory(result);
+        setFirstProductImage(result);
+        return result;
     }
 
+
     @Override
-    public void setFirstProductImage(Product product) {
-        List<ProductImage> list = productImageService.list(product.getId(), ProductImageService.type_single);
-        if (!list.isEmpty()) {
-            ProductImage productImage = list.get(0);
-            product.setFirstProductImage(productImage);
+    public void setFirstProductImage(Product p) {
+        List<ProductImage> pis = productImageService.list(p.getId(), ProductImageService.type_single);
+        if (!pis.isEmpty()) {
+            ProductImage pi = pis.get(0);
+            p.setFirstProductImage(pi);
         }
     }
 
     @Override
-    public void fill(List<Category> categorys) {
-        for (Category category : categorys) {
-            fill(category);
+    public void fill(List<Category> cs) {
+        for (Category c : cs) {
+            fill(c);
         }
     }
 
     @Override
-    public void fill(Category category) {
-        List<Product> products = list(category.getId());
-        category.setProducts(products);
+    public void fill(Category c) {
+        List<Product> ps = list(c.getId());
+        c.setProducts(ps);
     }
 
     @Override
-    public void fillByRow(List<Category> categorys) {
+    public void fillByRow(List<Category> cs) {
         int productNumberEachRow = 8;
-        for (Category cs : categorys) {
-            List<Product> ps = cs.getProducts();
+        for (Category c : cs) {
+            List<Product> products = c.getProducts();
             List<List<Product>> productsByRow = new ArrayList<>();
-            for (int i = 0; i <ps.size() ; i+=productNumberEachRow) {
-                int size = i+productNumberEachRow;
-                size =size>ps.size()?ps.size():size;
-                List<Product> productsOfEachRow = ps.subList(i, size);
+            for (int i = 0; i < products.size(); i += productNumberEachRow) {
+                int size = i + productNumberEachRow;
+                size = size > products.size() ? products.size() : size;
+                List<Product> productsOfEachRow = products.subList(i, size);
                 productsByRow.add(productsOfEachRow);
             }
-            cs.setProductsByRow(productsByRow);
+            c.setProductsByRow(productsByRow);
         }
     }
 
-    public void setFirstProductImage(List<Product> pis) {
-        for (Product pi : pis) {
-            setFirstProductImage(pi);
+    public void setFirstProductImage(List<Product> ps) {
+        for (Product p : ps) {
+            setFirstProductImage(p);
         }
     }
 }

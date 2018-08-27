@@ -4,6 +4,7 @@ import com.anran.tmall.mapper.UserMapper;
 import com.anran.tmall.pojo.User;
 import com.anran.tmall.pojo.UserExample;
 import com.anran.tmall.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User get(int id) {
-       return userMapper.selectByPrimaryKey(id);
+        return userMapper.selectByPrimaryKey(id);
     }
 
     @Override
@@ -48,5 +49,16 @@ public class UserServiceImpl implements UserService {
         example.setOrderByClause("id desc");
         List<User> users = userMapper.selectByExample(example);
         return users;
+    }
+
+    @Override
+    public boolean isExist(String name) {
+        UserExample example = new UserExample();
+        example.createCriteria().andNameEqualTo(name);
+        List<User> us = userMapper.selectByExample(example);
+        if (!us.isEmpty()) {
+            return true;
+        }
+        return false;
     }
 }
